@@ -52,6 +52,7 @@ module fastisostasy
     public :: bsl_init
     public :: bsl_update
     public :: bsl_restart_write
+    public :: bsl_restart_read
     public :: bsl_write_init
     public :: bsl_write_step
     public :: step_euler

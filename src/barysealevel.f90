@@ -32,6 +32,7 @@ module barysealevel
     public :: bsl_init
     public :: bsl_update
     public :: bsl_restart_write
+    public :: bsl_restart_read
     public :: bsl_write_init
     public :: bsl_write_step
 
@@ -449,6 +450,25 @@ contains
         call nc_close(ncid)
 
     end subroutine bsl_restart_write
+
+    ! Read back the prognostic barystatic sea level state (bsl_now, A_ocean_now)
+    ! written by bsl_restart_write. Counterpart to isos_restart_read
+    ! (isostasy_io.f90) for the bsl_class state.
+    subroutine bsl_restart_read(bsl, filename)
+
+        implicit none
+        type(bsl_class), intent(INOUT) :: bsl
+        character(len=*), intent(IN)   :: filename
+
+        call nc_read(filename, "bsl", bsl%bsl_now, start=[1], count=[1])
+        call nc_read(filename, "A_ocean", bsl%A_ocean_now, start=[1], count=[1])
+        bsl%bsl_init = bsl%bsl_now
+
+        write(*,*) "bsl_restart_read:: read in restart file: ", trim(filename)
+        write(*,*) "bsl_restart_read:: bsl_now = ", bsl%bsl_now, " m, A_ocean_now = ", &
+            bsl%A_ocean_now, " m^2"
+
+    end subroutine bsl_restart_read
 
     subroutine bsl_write_init(bsl, filename, time_init)
 
