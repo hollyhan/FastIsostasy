@@ -696,6 +696,14 @@ contains
         real(wp), dimension(size(w,1), size(w,2)) :: dwdt
         type(isos_class), intent(INOUT) :: isos
     
+        ! The integrators (step_rk4, step_tsit54, step_rkc, ...) and rkc's spectral-radius
+        ! probe evaluate this function at stage states `w` that differ from isos%now%w.
+        ! Use the state passed in, and refresh the mantle column anomaly (a function of w)
+        ! consistently, otherwise every stage sees the start-of-step state and all methods
+        ! reduce to forward Euler with a stiffness-limited stable step of ~0.04 yr.
+        isos%now%w = w
+        call calc_columnanoms_mantle(isos)
+
         ! write(*,*) "isos_update:: Update 7"
         ! Step 1: diagnose equilibrium displacement and rate of bedrock uplift
         select case(isos%par%method)
